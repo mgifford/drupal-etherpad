@@ -1,6 +1,9 @@
 name = Etherpad 
 description = Defines a field for embedding etherpads inside a page.
-dependencies[] = content
-package = CCK
-core = 6.x
+dependencies[] = field
+package = content
+core = 7.x
 
+
+files[] = etherpad.install
+files[] = etherpad.module

@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * @file
@@ -8,6 +7,10 @@
  * Functions for install and uninstall AND Migrations
  */
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function etherpad_requirements($phase) {
   $requirements = array();
   // Ensure translations don't break at install time
@@ -23,18 +26,21 @@ function etherpad_requirements($phase) {
 }
 
 /**
- * Implementation of hook_install().
+ * Implements hook_install().
  */
 function etherpad_install() {
   if (!module_exists('content') || !function_exists('content_notify')) {
-    $ret['#abort'] = array('success' => FALSE, 'query' => t('Required module "content" (cck) not found!'));
+    $ret['#abort'] = array(
+      'success' => FALSE,
+      'query' => st('Required module "content" (cck) not found!'),
+    );
     return $ret;
   }
   content_notify('install', 'etherpad');
 }
 
 /**
- * Implementation of hook_uninstall().
+ * Implements hook_uninstall().
  */
 function etherpad_uninstall() {
   if (module_exists('content') && function_exists('content_notify')) {
@@ -43,18 +49,21 @@ function etherpad_uninstall() {
 }
 
 /**
- * Implementation of hook_enable().
+ * Implements hook_enable().
  */
 function etherpad_enable() {
   if (!module_exists('content') || !function_exists('content_notify')) {
-    $ret['#abort'] = array('success' => FALSE, 'query' => t('Required module "content" (cck) not found!'));
+    $ret['#abort'] = array(
+      'success' => FALSE,
+      'query' => t('Required module "content" (cck) not found!'),
+    );
     return $ret;
   }
   content_notify('enable', 'etherpad');
 }
 
 /**
- * Implementation of hook_disable().
+ * Implements hook_disable().
  */
 function etherpad_disable() {
   if (module_exists('content') && function_exists('content_notify')) {

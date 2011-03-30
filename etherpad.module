@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * @file
@@ -8,7 +7,7 @@
  */
 
 /**
- * Implementation of hook_field_info().
+ * Implements hook_field_info().
  */
 function etherpad_field_info() {
   return array(
@@ -20,7 +19,7 @@ function etherpad_field_info() {
 }
 
 /**
- * Implementation of hook_field_settings().
+ * Implements hook_field_settings().
  * shown: at general setup of this field type on a content type
  */
 function etherpad_field_settings($op, $field) {
@@ -61,10 +60,10 @@ function etherpad_field_settings($op, $field) {
       return $form;
 
     case 'validate':
-      if (empty($field['attributes']['width']) || (int)$field['attributes']['width']<1) {
+      if (empty($field['attributes']['width']) || (int) $field['attributes']['width'] < 1) {
         form_set_error('width_value', t('A default width and height must be provided.'));
       }
-      if (empty($field['attributes']['height']) || (int)$field['attributes']['height']<1) {
+      if (empty($field['attributes']['height']) || (int) $field['attributes']['height'] < 1) {
         form_set_error('height_value', t('A default width and height must be provided.'));
       }
       break;
@@ -74,15 +73,15 @@ function etherpad_field_settings($op, $field) {
 
     case 'database columns':
       return array(
-        'etherpad_url' => array('type' => 'varchar', 'length' => 1024, 'not null' => FALSE,),
+        'etherpad_url' => array('type' => 'varchar', 'length' => 1024, 'not null' => FALSE),
         'etherpad_text' => array('type' => 'text', 'not null' => TRUE, 'size' => 'big'),
-        'attributes' => array('type' => 'text', 'size' => 'medium', 'not null' => FALSE),// Then add auto-generate etherpad function.
+        'attributes' => array('type' => 'text', 'size' => 'medium', 'not null' => FALSE), // Then add auto-generate etherpad function.
       );
   }
 }
 
 /**
- * Implementation of hook_content_is_empty().
+ * Implements hook_content_is_empty().
  */
 function etherpad_content_is_empty($item, $field) {
   if (empty($field['etherpad_url'])) {
@@ -92,7 +91,7 @@ function etherpad_content_is_empty($item, $field) {
 }
 
 /**
- * Implementation of hook_field().
+ * Implements hook_field().
  */
 function etherpad_field($op, &$node, $field, &$items, $teaser, $page) {
   switch ($op) {
@@ -103,13 +102,13 @@ function etherpad_field($op, &$node, $field, &$items, $teaser, $page) {
       }
       break;
     case 'presave':
-//      _etherpad_sanitize
+      //      _etherpad_sanitize
       break;
   }
 }
 
 /**
- * Implementation of hook_widget_info().
+ * Implements hook_widget_info().
  */
 function etherpad_widget_info() {
   return array(
@@ -125,7 +124,7 @@ function etherpad_widget_info() {
 }
 
 /**
- * Implementation of hook_widget().
+ * Implements hook_widget().
  */
 function etherpad_widget(&$form, &$form_state, $field, $items, $delta = 0) {
   $element['etherpad_url'] = array(
@@ -140,7 +139,7 @@ function etherpad_widget(&$form, &$form_state, $field, $items, $delta = 0) {
     '#type' => 'value',
     '#value' => (isset($items[$delta]['attributes']) && !empty($form['nid']['#value'])) ? $items[$delta]['attributes'] : serialize($field['attributes']),
   );
-  // Used so that hook_field('validate') knows where to 
+  // Used so that hook_field('validate') knows where to
   // flag an error in deeply nested forms.
   if (empty($form['#parents'])) {
     $form['#parents'] = array();
@@ -154,7 +153,7 @@ function etherpad_widget(&$form, &$form_state, $field, $items, $delta = 0) {
 }
 
 /**
- * Implementation of hook_widget_settings(). 
+ * Implements hook_widget_settings(). ().
  */
 function etherpad_widget_settings($op, $widget) {
 
@@ -188,18 +187,18 @@ function _etherpad_sanitize(&$item, $delta, &$field, &$node) {
 }
 
 /**
- * Implementation of hook_theme().
+ * Implements hook_theme().
  */
 function etherpad_theme() {
   return array(
     'etherpad_field_settings' => array(
-      'arguments' => array('element' => NULL),
+      'render element' => 'element',
     ),
     'etherpad_formatter_default' => array(
-      'arguments' => array('element' => NULL),
+      'render element' => 'element',
     ),
     'etherpad' => array(
-      'arguments' => array('element' => NULL),
+      'render element' => 'element',
     ),
   );
 }
@@ -207,13 +206,14 @@ function etherpad_theme() {
 /**
  * FAPI theme for an individual text elements.
  */
-function theme_etherpad($element) {
+function theme_etherpad($variables) {
+  $element = $variables['element'];
   //drupal_add_css(drupal_get_path('module', 'etherpad') .'/etherpad.css');
   return $element['#children'];
 }
 
 /**
- * Implementation of hook_field_formatter_info().
+ * Implements hook_field_formatter_info().
  */
 function etherpad_field_formatter_info() {
   return array(
@@ -228,7 +228,8 @@ function etherpad_field_formatter_info() {
 /**
  * Theme function for 'default' text field formatter.
  */
-function theme_etherpad_formatter_default($element) {
+function theme_etherpad_formatter_default($variables) {
+  $element = $variables['element'];
   // If no etherpad_url given display nothing.
   if (empty($element['#item']['etherpad_url'])) {
     return '';
@@ -240,9 +241,13 @@ function theme_etherpad_formatter_default($element) {
 /*
  * validate size: width and height of an etherpad
  */
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function etherpad_validate_size($size, $default = "100") {
   if (is_numeric($size)) {
-    return $size>0? $size : $default;
+    return $size > 0 ? $size : $default;
   }
   if (preg_match('/^\d+\%$/', $size)) {
     return $size;
@@ -253,6 +258,10 @@ function etherpad_validate_size($size, $default = "100") {
 /*
  * like central function
  * form the etherpad code
+ */
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
  */
 function etherpad_etherpad($path, $options = FALSE) {
   if (!$options) {
@@ -268,18 +277,23 @@ function etherpad_etherpad($path, $options = FALSE) {
   if (!isset($options['attributes']['height'])) {
     $options['attributes']['height'] = '701';
   }
-  
+
   $path = $path . "?_theme=nano"; // Randomly generate id, figure out why this doesn't want to work on book / polls. Fetch html, for teaser, show straight HTML
   $htmlid = '';
   if (isset($options['html-id']) && !empty($options['html-id'])) {
     $htmlid = ' id="' . $options['html-id'] . '" name="' . $options['html-id'] . '"';
   }
+  // TODO The second parameter to this function call should be an array.
   return ('<iframe src="' . check_url(url($path, $options)) . '"' . drupal_attributes($options['attributes']) .
     $htmlid .
     '>' .
      t('Your browser does not support iframes. To reach the same content, visit ' . url($path, array('absolute' => TRUE)) . '</iframe>'));
 }
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function etherpad_generate_padid($domain) {
   if (empty($domain)) {
     return "Etherpad domain not set.";
@@ -289,7 +303,7 @@ function etherpad_generate_padid($domain) {
 
   $ch = curl_init();
 
- // Kill any output from curl.
+  // Kill any output from curl.
   curl_setopt($ch, CURLOPT_HEADER, 0);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
@@ -297,7 +311,7 @@ function etherpad_generate_padid($domain) {
   $cookie_file = sys_get_temp_dir() . '/cookie-curl.txt';
   curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie_file);
   curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie_file);
-  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
 
   # first, post to get a cookie
   curl_setopt($ch, CURLOPT_URL, 'http://etherpad.com/' . urlencode($pad_id));
@@ -306,7 +320,7 @@ function etherpad_generate_padid($domain) {
   # next, post to actually create the etherpad
   curl_setopt($ch, CURLOPT_URL, $domain . '/ep/pad/create');
   curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie_file);
-  curl_setopt($ch, CURLOPT_POST, true);
+  curl_setopt($ch, CURLOPT_POST, TRUE);
   curl_setopt($ch, CURLOPT_POSTFIELDS, 'padId=' . urlencode($pad_id));
   $result = curl_exec($ch);
 
@@ -316,7 +330,7 @@ function etherpad_generate_padid($domain) {
 }
 
 /**
- * Implementation of hook_og_mailinglist_new_node_alter().
+ * Implements hook_og_mailinglist_new_node_alter().
  *
  * Change the default OG Mailinglist email to something more fitting to Etherpad.
  **/
